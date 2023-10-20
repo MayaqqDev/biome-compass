@@ -3,6 +3,7 @@
   "item.biomecompass.biome_compass": "Biome Compass",
   "item.biomecompass.biome_compass.tooltip.biome_name": "Biome: %s",
   "item.biomecompass.biome_compass.tooltip.biome_pos": "Pos: %s",
+  "item.biomecompass.biome_compass.tooltip.creative_tip": "Use while sneaking to teleport to the selected biome.",
   "gui.biomecompass.biome_compass.title": "Biome Compass",
   "gui.biomecompass.biome_compass.title.with_biome": "Biome Compass | %s",
   "gui.biomecompass.biome_compass.search": "Search",

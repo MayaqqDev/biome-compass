@@ -14,14 +14,13 @@ import net.minecraft.item.CompassItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
-import net.minecraft.nbt.NbtCompound;
-import net.minecraft.nbt.NbtHelper;
-import net.minecraft.nbt.NbtOps;
+import net.minecraft.nbt.*;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.Formatting;
 import net.minecraft.util.Hand;
 import net.minecraft.util.TypedActionResult;
 import net.minecraft.util.math.BlockPos;
@@ -46,8 +45,7 @@ public class BiomeCompassItem extends Item implements PolymerItem {
     }
 
     private static boolean hasBiome(ItemStack stack) {
-        NbtCompound nbt = stack.getNbt();
-        return nbt != null && nbt.contains(BIOME_NAME_KEY);
+        return stack.getNbt() != null && stack.getNbt().contains(BIOME_NAME_KEY);
     }
 
     private static Optional<RegistryKey<World>> getBiomeDimension(NbtCompound nbt) {
@@ -90,11 +88,12 @@ public class BiomeCompassItem extends Item implements PolymerItem {
 
     @Override
     public void appendTooltip(ItemStack stack, @Nullable World world, List<Text> tooltip, TooltipContext context) {
+        super.appendTooltip(stack, world, tooltip, context);
+
         if (stack.hasNbt() && stack.getNbt().contains(BIOME_NAME_KEY) && stack.getNbt().contains(BIOME_POS_KEY)) {
             tooltip.add(Text.translatable("item.biomecompass.biome_compass.tooltip.biome_name", TextHelper.getBiomeNameFormatted(stack)));
             tooltip.add(Text.translatable("item.biomecompass.biome_compass.tooltip.biome_pos", TextHelper.getBlockPosFormatted(stack)));
         }
-        super.appendTooltip(stack, world, tooltip, context);
     }
 
     @Override
@@ -127,6 +126,27 @@ public class BiomeCompassItem extends Item implements PolymerItem {
 
         if (hasBiome(itemStack)) {
             fake.addEnchantment(Enchantments.INFINITY, 0);
+
+            if (player.isCreative()) {
+                NbtString tip = NbtString.of(Text.Serializer.toJson(Text.translatable("item.biomecompass.biome_compass.tooltip.creative_tip").formatted(Formatting.GRAY, Formatting.ITALIC)));
+                NbtList lore = new NbtList();
+                NbtCompound display = new NbtCompound();
+                NbtCompound fakeNbt = fake.getNbt();
+
+                if (fakeNbt.get(ItemStack.DISPLAY_KEY) != null) {
+                    display = fakeNbt.getCompound(ItemStack.DISPLAY_KEY);
+
+                    if (display.getType(ItemStack.LORE_KEY) == NbtElement.LIST_TYPE) {
+                        lore = display.getList(ItemStack.LORE_KEY, NbtElement.STRING_TYPE);
+                    }
+                }
+
+                lore.add(tip);
+                display.put(ItemStack.LORE_KEY, lore);
+                fakeNbt.put(ItemStack.DISPLAY_KEY, display);
+
+                fake.setNbt(fakeNbt);
+            }
         }
 
         return fake;
