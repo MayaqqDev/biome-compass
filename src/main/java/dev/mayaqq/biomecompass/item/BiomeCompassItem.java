@@ -5,6 +5,8 @@ import dev.mayaqq.biomecompass.gui.BiomeSelectionGui;
 import dev.mayaqq.biomecompass.helper.TextHelper;
 import dev.mayaqq.biomecompass.registry.BCItems;
 import eu.pb4.polymer.core.api.item.PolymerItem;
+import eu.pb4.polymer.resourcepack.api.PolymerModelData;
+import eu.pb4.polymer.resourcepack.api.PolymerResourcePackUtils;
 import net.minecraft.client.item.TooltipContext;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.player.PlayerEntity;
@@ -30,6 +32,8 @@ import java.util.List;
 import java.util.Optional;
 
 public class BiomeCompassItem extends Item implements PolymerItem {
+    private final PolymerModelData model;
+
     public static final String BIOME_NAME_KEY = BiomeCompass.id("biome_name").toString();
     public static final String BIOME_DIMENSION_KEY = BiomeCompass.id("biome_dimension").toString();
     public static final String BIOME_POS_KEY = BiomeCompass.id("biome_pos").toString();
@@ -37,6 +41,8 @@ public class BiomeCompassItem extends Item implements PolymerItem {
 
     public BiomeCompassItem(Settings settings) {
         super(settings);
+
+        this.model = PolymerResourcePackUtils.requestModel(Items.COMPASS, BiomeCompass.id("item/biome_compass"));
     }
 
     private static boolean hasBiome(ItemStack stack) {
@@ -124,5 +130,10 @@ public class BiomeCompassItem extends Item implements PolymerItem {
         }
 
         return fake;
+    }
+
+    @Override
+    public int getPolymerCustomModelData(ItemStack itemStack, @Nullable ServerPlayerEntity player) {
+        return this.model.value();
     }
 }
